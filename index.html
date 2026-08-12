@@ -61,8 +61,6 @@ scene.add(ground);
 // 5. CARREGAR O MODELO GLB
 const loader = new GLTFLoader();
 
-// Exemplo 1: Modelo gratuito da Microsoft (DamagedHelmet)
-
 loader.load(
   './casa1.glb',
   (gltf) => {
@@ -102,7 +100,18 @@ sphere.position.set(0, 0.5, -2);
 sphere.castShadow = true;
 scene.add(sphere);
 
-// 7. Ajuste de tela
+// 7. Loop
+function animate() {
+  requestAnimationFrame(animate);
+  
+  // Gira a esfera de referência (opcional)
+  sphere.rotation.y += 0.01;
+  
+  renderer.render(scene, camera);
+}
+animate();
+
+// 8. Ajuste de tela
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
