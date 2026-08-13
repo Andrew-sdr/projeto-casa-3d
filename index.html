@@ -3,17 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
-    <title>Casa 3D - Dual Joystick</title>
+    <title>Modelo 3D com Joysticks</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         body {
             overflow: hidden;
             background: #000;
@@ -24,13 +16,35 @@
             top: 0;
             left: 0;
         }
-        
-        #game-container {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #111;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-family: Arial;
+            z-index: 999;
+            flex-direction: column;
         }
-        
+        #loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #333;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         #info {
             position: fixed;
             bottom: 20px;
@@ -64,26 +78,10 @@
                 rgba(0,0,0,0.2) 100%
             );
             border: 2px solid rgba(255,255,255,0.15);
-            box-shadow: 
-                0 0 30px rgba(0,0,0,0.5),
-                inset 0 0 30px rgba(0,0,0,0.3);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.3);
             backdrop-filter: blur(5px);
             transition: all 0.3s ease;
         }
-        
-        .joystick-zone::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 60%;
-            height: 60%;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.05);
-            pointer-events: none;
-        }
-        
         .joystick-knob {
             position: absolute;
             top: 50%;
@@ -97,20 +95,14 @@
             );
             transform: translate(-50%, -50%);
             pointer-events: none;
-            box-shadow: 
-                0 0 20px rgba(0,0,0,0.3),
-                inset 0 -2px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 0 20px rgba(0,0,0,0.3), inset 0 -2px 10px rgba(0,0,0,0.2);
             border: 2px solid rgba(255,255,255,0.2);
             transition: box-shadow 0.2s;
         }
-        
         .joystick-knob.active {
-            box-shadow: 
-                0 0 30px rgba(100, 200, 255, 0.3),
-                inset 0 -2px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 0 30px rgba(100, 200, 255, 0.3), inset 0 -2px 10px rgba(0,0,0,0.2);
             border-color: rgba(100, 200, 255, 0.4);
         }
-        
         .joystick-label {
             position: absolute;
             bottom: -30px;
@@ -124,7 +116,6 @@
             pointer-events: none;
             white-space: nowrap;
         }
-        
         .joystick-icon {
             position: absolute;
             top: 50%;
@@ -136,85 +127,52 @@
             pointer-events: none;
             fill: rgba(255,255,255,0.3);
         }
-        
-        /* ===== RESPONSIVIDADE ===== */
         @media (max-width: 500px) {
-            .joystick-zone {
-                width: 120px;
-                height: 120px;
-            }
-            .joystick-knob {
-                width: 40px;
-                height: 40px;
-            }
-            .joystick-label {
-                font-size: 9px;
-                bottom: -25px;
-            }
-            #info {
-                font-size: 9px;
-                padding: 6px 12px;
-                bottom: 10px;
-            }
+            .joystick-zone { width: 120px; height: 120px; }
+            .joystick-knob { width: 40px; height: 40px; }
+            .joystick-label { font-size: 9px; bottom: -25px; }
+            #info { font-size: 9px; padding: 6px 12px; bottom: 10px; }
         }
-        
         @media (max-width: 400px) {
-            .joystick-zone {
-                width: 100px;
-                height: 100px;
-            }
-            .joystick-knob {
-                width: 35px;
-                height: 35px;
-            }
+            .joystick-zone { width: 100px; height: 100px; }
+            .joystick-knob { width: 35px; height: 35px; }
         }
-        
         @media (orientation: landscape) and (max-height: 500px) {
-            .joystick-zone {
-                width: 110px;
-                height: 110px;
-            }
-            .joystick-knob {
-                width: 38px;
-                height: 38px;
-            }
-            .joystick-label {
-                font-size: 8px;
-                bottom: -22px;
-            }
-            #info {
-                font-size: 8px;
-                padding: 4px 10px;
-                bottom: 5px;
-            }
+            .joystick-zone { width: 110px; height: 110px; }
+            .joystick-knob { width: 38px; height: 38px; }
+            .joystick-label { font-size: 8px; bottom: -22px; }
+            #info { font-size: 8px; padding: 4px 10px; bottom: 5px; }
         }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <div id="info">🎮 Esquerdo: andar | Direito: olhar</div>
-        
-        <!-- Joystick Esquerdo - Movimento -->
-        <div id="joystick-move" class="joystick-zone">
-            <div class="joystick-knob" id="knob-move">
-                <svg class="joystick-icon" viewBox="0 0 24 24">
-                    <path d="M12 2C12 2 8 8 8 12C8 14.2 9.8 16 12 16C14.2 16 16 14.2 16 12C16 8 12 2 12 2Z"/>
-                    <path d="M12 8L9 11H11V15H13V11H15L12 8Z"/>
-                </svg>
-            </div>
-            <div class="joystick-label">Movimento</div>
+    <div id="loading">
+        <div class="spinner"></div>
+        <div>Carregando modelo 3D...</div>
+        <div id="progress" style="font-size:14px;color:#888;margin-top:10px;"></div>
+    </div>
+    <div id="info">🎮 Joystick Esquerdo: andar | Direito: olhar</div>
+    
+    <!-- Joystick Esquerdo - Movimento -->
+    <div id="joystick-move" class="joystick-zone">
+        <div class="joystick-knob" id="knob-move">
+            <svg class="joystick-icon" viewBox="0 0 24 24">
+                <path d="M12 2C12 2 8 8 8 12C8 14.2 9.8 16 12 16C14.2 16 16 14.2 16 12C16 8 12 2 12 2Z"/>
+                <path d="M12 8L9 11H11V15H13V11H15L12 8Z"/>
+            </svg>
         </div>
-        
-        <!-- Joystick Direito - Câmera -->
-        <div id="joystick-look" class="joystick-zone">
-            <div class="joystick-knob" id="knob-look">
-                <svg class="joystick-icon" viewBox="0 0 24 24">
-                    <path d="M12 2C12 2 8 8 8 12C8 14.2 9.8 16 12 16C14.2 16 16 14.2 16 12C16 8 12 2 12 2Z"/>
-                    <circle cx="12" cy="12" r="2"/>
-                </svg>
-            </div>
-            <div class="joystick-label">Câmera</div>
+        <div class="joystick-label">Movimento</div>
+    </div>
+    
+    <!-- Joystick Direito - Câmera -->
+    <div id="joystick-look" class="joystick-zone">
+        <div class="joystick-knob" id="knob-look">
+            <svg class="joystick-icon" viewBox="0 0 24 24">
+                <path d="M12 2C12 2 8 8 8 12C8 14.2 9.8 16 12 16C14.2 16 16 14.2 16 12C16 8 12 2 12 2Z"/>
+                <circle cx="12" cy="12" r="2"/>
+            </svg>
         </div>
+        <div class="joystick-label">Câmera</div>
     </div>
 
     <script type="importmap">
@@ -227,12 +185,17 @@
     </script>
 
     <script type="module">
+    // ===== IMPORTAÇÕES =====
     import * as THREE from 'three';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-    // ============================================================
-    // 1. CENA 3D
-    // ============================================================
+    // ===== LOADING SCREEN =====
+    const loadingDiv = document.getElementById('loading');
+    const progressDiv = document.getElementById('progress');
+
+    // ===== CENA =====
+    console.log('🎮 Iniciando cena 3D...');
+    
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87CEEB);
 
@@ -241,61 +204,58 @@
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
     document.body.appendChild(renderer.domElement);
 
-    // ============================================================
-    // 2. LUZES
-    // ============================================================
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    
-    const sun = new THREE.DirectionalLight(0xffeedd, 1.5);
+    // ===== LUZES =====
+    console.log('💡 Configurando luzes...');
+    scene.add(new THREE.AmbientLight(0x404060, 0.5));
+
+    const sun = new THREE.DirectionalLight(0xffffff, 1.5);
     sun.position.set(10, 20, 10);
     sun.castShadow = true;
     sun.shadow.mapSize.width = 1024;
     sun.shadow.mapSize.height = 1024;
     scene.add(sun);
 
-    const fillLight = new THREE.DirectionalLight(0x88ccff, 0.3);
-    fillLight.position.set(-10, 5, 10);
+    const fillLight = new THREE.DirectionalLight(0x4488ff, 0.3);
+    fillLight.position.set(-10, 0, 10);
     scene.add(fillLight);
 
-    // ============================================================
-    // 3. CHÃO
-    // ============================================================
+    // ===== CHÃO =====
+    console.log('🏗️ Criando chão...');
     const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(20, 20),
-        new THREE.MeshStandardMaterial({ 
-            color: 0x8BAA8B,
-            roughness: 0.8,
-            metalness: 0.1
-        })
+        new THREE.PlaneGeometry(40, 60),
+        new THREE.MeshStandardMaterial({ color: 0x3a7d5c })
     );
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -0.5;
     ground.receiveShadow = true;
     scene.add(ground);
 
+    // ===== GRADE DE REFERÊNCIA =====
     const grid = new THREE.GridHelper(20, 20, 0x88aaff, 0x445588);
     grid.position.y = -0.49;
     scene.add(grid);
 
-    // ============================================================
-    // 4. MODELO 3D
-    // ============================================================
+    // ===== CARREGAR MODELO =====
+    console.log('📦 Iniciando carregamento do modelo...');
     const loader = new GLTFLoader();
-    let model = null;
+    
+    const modelPath = './casa1.glb';
+
+    console.log(`🔍 Tentando carregar: ${modelPath}`);
 
     loader.load(
-        './casa1.glb',
+        modelPath,
         (gltf) => {
-            model = gltf.scene;
-            model.position.set(0, 0, -2);
-            model.scale.set(0.5, 0.5, 0.5);
+            console.log('✅ MODELO CARREGADO COM SUCESSO!');
+            const model = gltf.scene;
+            
+            // ===== MESMA CONFIGURAÇÃO QUE FUNCIONOU =====
+            model.position.set(0, -0.5, 0);
+            model.scale.set(0.2, 0.2, 0.2);
             
             model.traverse((child) => {
                 if (child.isMesh) {
@@ -305,29 +265,32 @@
             });
             
             scene.add(model);
-            console.log('✅ Modelo carregado!');
-            
-            requestAnimationFrame(() => {
-                const box = new THREE.Box3().setFromObject(model);
-                const center = box.getCenter(new THREE.Vector3());
-                const size = box.getSize(new THREE.Vector3());
-                const yBase = -0.5;
-                const yCorrecao = yBase - (center.y - size.y / 2);
-                model.position.y += yCorrecao;
-                console.log(`📍 Altura ajustada: ${model.position.y.toFixed(2)}`);
-            });
+            loadingDiv.style.display = 'none';
+            console.log('🎉 Modelo adicionado à cena!');
         },
         (xhr) => {
             const percent = Math.round((xhr.loaded / xhr.total) * 100);
-            console.log(`📦 ${percent}%`);
+            progressDiv.textContent = `${percent}%`;
+            console.log(`📦 Carregando: ${percent}%`);
         },
         (error) => {
-            console.error('❌ Erro:', error);
+            console.error('❌ ERRO AO CARREGAR MODELO:', error);
+            loadingDiv.innerHTML = `
+                <div style="color:#ff4444;font-size:48px;margin-bottom:20px;">❌</div>
+                <div style="color:white;">Erro ao carregar o modelo</div>
+                <div style="color:#888;font-size:14px;margin-top:10px;max-width:400px;text-align:center;">
+                    Verifique se o arquivo <b>casa1.glb</b> está na mesma pasta que este HTML.<br>
+                    <span style="color:#ffaa00;">Detalhes:</span> ${error.message || 'Erro desconhecido'}
+                </div>
+                <button onclick="location.reload()" style="margin-top:20px;padding:10px 20px;background:#4CAF50;color:white;border:none;border-radius:5px;cursor:pointer;font-size:16px;">
+                    🔄 Tentar novamente
+                </button>
+            `;
         }
     );
 
     // ============================================================
-    // 5. SISTEMA DE DOIS JOYSTICKS COM REPOSICIONAMENTO
+    // SISTEMA DE DOIS JOYSTICKS
     // ============================================================
     
     const moveState = { x: 0, y: 0, active: false };
@@ -336,35 +299,20 @@
     let cameraRotationX = 0;
     let cameraRotationY = 0;
 
-    // ===== FUNÇÃO PARA REPOSICIONAR JOYSTICKS =====
+    // ===== REPOSICIONAR JOYSTICKS =====
     function reposicionarJoysticks() {
         const moveZone = document.getElementById('joystick-move');
         const lookZone = document.getElementById('joystick-look');
-        
         if (!moveZone || !lookZone) return;
         
         const isLandscape = window.innerWidth > window.innerHeight;
         const isSmall = window.innerWidth < 600 || window.innerHeight < 500;
         
-        // Tamanho base
-        let size = 150;
-        let knobSize = 50;
-        let bottomOffset = 40;
-        let sideOffset = 40;
+        let size = 150, knobSize = 50, bottomOffset = 40, sideOffset = 40;
         
-        if (isSmall) {
-            size = 110;
-            knobSize = 38;
-            bottomOffset = 20;
-            sideOffset = 20;
-        } else if (window.innerWidth < 500) {
-            size = 120;
-            knobSize = 40;
-            bottomOffset = 30;
-            sideOffset = 30;
-        }
+        if (isSmall) { size = 110; knobSize = 38; bottomOffset = 20; sideOffset = 20; }
+        else if (window.innerWidth < 500) { size = 120; knobSize = 40; bottomOffset = 30; sideOffset = 30; }
         
-        // Ajustes para paisagem
         if (isLandscape) {
             size = Math.min(size, window.innerHeight * 0.3);
             knobSize = Math.min(knobSize, size * 0.35);
@@ -372,19 +320,16 @@
             sideOffset = Math.max(10, window.innerWidth * 0.05);
         }
         
-        // Aplicar tamanhos
         moveZone.style.width = size + 'px';
         moveZone.style.height = size + 'px';
         lookZone.style.width = size + 'px';
         lookZone.style.height = size + 'px';
         
-        // Ajustar knob
         document.querySelectorAll('.joystick-knob').forEach(k => {
             k.style.width = knobSize + 'px';
             k.style.height = knobSize + 'px';
         });
         
-        // Posicionar
         moveZone.style.bottom = bottomOffset + 'px';
         moveZone.style.left = sideOffset + 'px';
         moveZone.style.top = 'auto';
@@ -394,22 +339,12 @@
         lookZone.style.right = sideOffset + 'px';
         lookZone.style.top = 'auto';
         lookZone.style.left = 'auto';
-        
-        // Ajustar labels
-        document.querySelectorAll('.joystick-label').forEach(label => {
-            const fontSize = isSmall ? '8px' : (isLandscape ? '9px' : '11px');
-            label.style.fontSize = fontSize;
-            label.style.bottom = (isSmall ? '-20px' : (isLandscape ? '-22px' : '-30px'));
-        });
-        
-        console.log(`📱 Reposicionado: ${isLandscape ? 'Paisagem' : 'Retrato'} | Tamanho: ${size}px`);
     }
 
-    // ===== FUNÇÃO PARA CONFIGURAR JOYSTICK =====
+    // ===== CONFIGURAR JOYSTICK =====
     function setupJoystick(zoneId, knobId, state) {
         const zone = document.getElementById(zoneId);
         const knob = document.getElementById(knobId);
-        
         if (!zone || !knob) return;
         
         function getCenter() {
@@ -449,9 +384,7 @@
         }
         
         function resetKnob() {
-            state.x = 0;
-            state.y = 0;
-            state.active = false;
+            state.x = 0; state.y = 0; state.active = false;
             knob.style.transform = 'translate(-50%, -50%)';
             knob.classList.remove('active');
         }
@@ -481,7 +414,7 @@
             resetKnob();
         });
         
-        // Suporte a mouse
+        // Suporte a mouse (para testes no desktop)
         let isMouseDown = false;
         zone.addEventListener('mousedown', (e) => {
             isMouseDown = true;
@@ -503,47 +436,34 @@
         });
     }
 
-    // ===== INICIALIZAR =====
+    // ===== INICIALIZAR JOYSTICKS =====
     setupJoystick('joystick-move', 'knob-move', moveState);
     setupJoystick('joystick-look', 'knob-look', lookState);
-    
-    // Posicionar inicialmente
     setTimeout(reposicionarJoysticks, 100);
 
-    // ============================================================
-    // 6. DETECÇÃO DE MUDANÇA DE ORIENTAÇÃO
-    // ============================================================
-    let orientationTimeout = null;
-    
+    // ===== DETECÇÃO DE MUDANÇA DE ORIENTAÇÃO =====
     window.addEventListener('resize', () => {
-        // Debounce para evitar múltiplas chamadas
-        clearTimeout(orientationTimeout);
-        orientationTimeout = setTimeout(() => {
-            reposicionarJoysticks();
-            
-            // Atualizar câmera
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }, 300);
+        reposicionarJoysticks();
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // Detectar orientação via API (se disponível)
     if (screen.orientation) {
         screen.orientation.addEventListener('change', () => {
             setTimeout(reposicionarJoysticks, 300);
         });
     }
 
-    // ============================================================
-    // 7. LOOP PRINCIPAL
-    // ============================================================
+    // ===== LOOP PRINCIPAL =====
     function animate() {
         requestAnimationFrame(animate);
         
-        // Movimento
+        // ===== MOVIMENTO (Joystick Esquerdo) =====
         if (moveState.active && (Math.abs(moveState.x) > 0.05 || Math.abs(moveState.y) > 0.05)) {
             const speed = 0.06;
+            
+            // Direção baseada na rotação da câmera
             const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
             forward.y = 0;
             forward.normalize();
@@ -557,7 +477,7 @@
             camera.position.y = 1.6;
         }
         
-        // Câmera
+        // ===== CÂMERA (Joystick Direito) =====
         if (lookState.active && (Math.abs(lookState.x) > 0.05 || Math.abs(lookState.y) > 0.05)) {
             const sensitivity = 0.03;
             cameraRotationX -= lookState.x * sensitivity;
@@ -573,9 +493,7 @@
     }
     animate();
 
-    // ============================================================
-    // 8. PREVENÇÃO DE COMPORTAMENTOS INDESEJADOS
-    // ============================================================
+    // ===== PREVENÇÃO =====
     document.addEventListener('touchmove', (e) => {
         if (e.target.closest('.joystick-zone') || e.target === renderer.domElement) {
             e.preventDefault();
@@ -584,8 +502,8 @@
 
     document.addEventListener('contextmenu', (e) => e.preventDefault());
 
-    console.log('🎮 Dual Joystick com suporte a paisagem!');
-    console.log('📱 Vire o celular para testar o reposicionamento automático');
+    console.log('✅ Cena com joysticks iniciada!');
+    console.log('📱 Teste no celular ou use o mouse para simular toque');
     </script>
 </body>
 </html>
