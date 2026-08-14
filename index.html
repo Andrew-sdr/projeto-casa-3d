@@ -558,9 +558,9 @@
         const delta = Math.min((time - lastTime) / 1000, 0.05);
         lastTime = time;
         
-        // MOVIMENTO
+        // Movimento
         if (moveState.active && (Math.abs(moveState.x) > 0.05 || Math.abs(moveState.y) > 0.05)) {
-            const speed = 0.06;
+            const speed = 4.0;
             const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
             forward.y = 0;
             forward.normalize();
@@ -568,7 +568,7 @@
             const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
             right.y = 0;
             right.normalize();
-
+            
             const forceX = (-moveState.y * forward.x + moveState.x * right.x) * speed;
             const forceZ = (-moveState.y * forward.z + moveState.x * right.z) * speed;
             
@@ -577,7 +577,6 @@
         } else {
             playerBody.velocity.x *= 0.9;
             playerBody.velocity.z *= 0.9;
-            camera.position.y = 1.65;
         }
         
         // ===== CÂMERA (Joystick Direito) =====
