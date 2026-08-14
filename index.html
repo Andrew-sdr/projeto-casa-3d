@@ -569,11 +569,11 @@
             right.y = 0;
             right.normalize();
             
-            const forceX = (-moveState.y * forward.x + moveState.x * right.x) * speed;
-            const forceZ = (-moveState.y * forward.z + moveState.x * right.z) * speed;
+            const moveX = (-moveState.y * forward.x + moveState.x * right.x) * speed;
+            const moveZ = (-moveState.y * forward.z + moveState.x * right.z) * speed;
             
-            playerBody.velocity.x = forceX;
-            playerBody.velocity.z = forceZ;
+            playerBody.velocity.x = moveX;
+            playerBody.velocity.z = moveZ;
         } else {
             playerBody.velocity.x *= 0.9;
             playerBody.velocity.z *= 0.9;
