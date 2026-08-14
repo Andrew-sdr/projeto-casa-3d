@@ -560,21 +560,18 @@
 
         // MOVIMENTO
         if (moveState.active) {
-            const speed = 4.0;
-            const moveX = moveState.x * speed;
-            const moveZ = -moveState.y * speed;
-
-            // Aplicar força baseada na rotação da câmera
+            const speed = 5.0;
+            // Movimento baseado na câmera
             const angle = camera.rotation.y;
-            const cos = Math.cos(angle);
-            const sin = Math.sin(angle);
-
-            playerBody.velocity.x = moveX * cos - moveZ * sin;
-        playerBody.velocity.z = moveX * sin + moveZ * cos;
+            const forward = new THREE.Vector3(-Math.sin(angle), 0, -Math.cos(angle));
+            const right = new THREE.Vector3(Math.cos(angle), 0, -Math.sin(angle));
+    
+            playerBody.velocity.x = (moveState.x * right.x + moveState.y * forward.x) * speed;
+            playerBody.velocity.z = (moveState.x * right.z + moveState.y * forward.z) * speed;
         } else {
-            playerBody.velocity.x *= 0.85;
-        playerBody.velocity.z *= 0.85;
-        }   
+            playerBody.velocity.x *= 0.9;
+            playerBody.velocity.z *= 0.9;
+        }
 
         // ===== CÂMERA (Joystick Direito) =====
         if (lookState.active && (Math.abs(lookState.x) > 0.05 || Math.abs(lookState.y) > 0.05)) {
