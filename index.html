@@ -297,7 +297,7 @@
     // ============================================================
     // PISO 2º ANDAR
     // ============================================================
-    const alturaPiso2 = 4.1;
+    const alturaPiso2 = 4.2;
     
     const piso2Mat = new THREE.MeshStandardMaterial({ 
         color: 0x8B7D6B,
@@ -322,7 +322,7 @@
     world.addBody(piso2Body);
 
     // ============================================================
-    // 8. ESCADA EXTERNA
+    // ESCADA EXTERNA
     // ============================================================
     const rampaMat = new THREE.MeshStandardMaterial({ 
         color: 0xCD853F,
@@ -331,9 +331,9 @@
         side: THREE.DoubleSide
     });
 
-    // Rampa na lateral da casa (entrando pelo lado direito)
+    // Rampa
     const rampaLargura = 3.0;
-    const rampaAltura = alturaPiso2 + 0.5; // Vai até o piso do 2º andar
+    const rampaAltura = alturaPiso2 + 0.5;
     const rampaComprimento = 5.5;
     const anguloRampa = Math.atan2(rampaAltura, rampaComprimento);
 
@@ -342,7 +342,7 @@
         new THREE.BoxGeometry(rampaLargura, 0.1, rampaComprimento),
         rampaMat
     );
-    // Posicionar a rampa na lateral direita da casa
+        
     rampaMesh.position.set(6.5, -0.5 + rampaAltura/2, 0);
     rampaMesh.rotation.x = -anguloRampa;
     rampaMesh.castShadow = true;
@@ -355,6 +355,33 @@
     rampaBody.position.set(6.5, -0.5 + rampaAltura/2, 0);
     rampaBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -anguloRampa);
     world.addBody(rampaBody);
+
+    // ============================================================
+    // PERSONAGEM    
+    // ============================================================
+    const playerRadius = 0.3;
+    const playerMat = new THREE.MeshStandardMaterial({ 
+        color: 0xff4400,
+        emissive: 0xff2200,
+        emissiveIntensity: 0.1,
+        roughness: 0.3,
+        metalness: 0.1
+    });
+    const playerMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(playerRadius, 16, 16),
+        playerMat
+    );
+    playerMesh.castShadow = true;
+    scene.add(playerMesh);
+
+    const playerBody = new CANNON.Body({
+        mass: 2,
+        shape: new CANNON.Sphere(playerRadius)
+    });
+    playerBody.position.set(2, 1.6, 0);
+    playerBody.linearDamping = 0.95;
+    playerBody.angularDamping = 0.95;
+    world.addBody(playerBody);
     
     // ============================================================
     // SISTEMA DE DOIS JOYSTICKS
@@ -523,14 +550,17 @@
     }
 
     // ===== LOOP PRINCIPAL =====
+    let lastTime = 0;
+    
     function animate() {
         requestAnimationFrame(animate);
+
+        const delta = Math.min((time - lastTime) / 1000, 0.05);
+        lastTime = time;
         
-        // ===== MOVIMENTO (Joystick Esquerdo) =====
+        // MOVIMENTO
         if (moveState.active && (Math.abs(moveState.x) > 0.05 || Math.abs(moveState.y) > 0.05)) {
             const speed = 0.06;
-            
-            // Direção baseada na rotação da câmera
             const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
             forward.y = 0;
             forward.normalize();
@@ -538,9 +568,15 @@
             const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
             right.y = 0;
             right.normalize();
+
+            const forceX = (-moveState.y * forward.x + moveState.x * right.x) * speed;
+            const forceZ = (-moveState.y * forward.z + moveState.x * right.z) * speed;
             
-            camera.position.add(forward.clone().multiplyScalar(-moveState.y * speed));
-            camera.position.add(right.clone().multiplyScalar(moveState.x * speed));
+            playerBody.velocity.x = forceX;
+            playerBody.velocity.z = forceZ;
+        } else {
+            playerBody.velocity.x *= 0.9;
+            playerBody.velocity.z *= 0.9;
             camera.position.y = 1.65;
         }
         
@@ -555,6 +591,22 @@
             camera.rotation.y = cameraRotationX;
             camera.rotation.x = cameraRotationY;
         }
+        
+        // Física
+        world.step(1 / 60, delta, 3);
+
+        // Seguir jogador
+        const playerPos = playerBody.position;
+        camera.position.set(
+            playerPos.x,
+            playerPos.y + 1.3,
+            playerPos.z
+        );
+        camera.rotation.order = 'YXZ';
+        camera.rotation.y = cameraRotationX;
+        camera.rotation.x = cameraRotationY;
+
+        playerMesh.position.copy(playerPos);
         
         renderer.render(scene, camera);
     }
