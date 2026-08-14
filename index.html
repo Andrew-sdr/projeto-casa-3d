@@ -297,12 +297,12 @@
     // ============================================================
     // PISO 2º ANDAR
     // ============================================================
-    const alturaPiso2 = 4.0;
+    const alturaPiso2 = 4.1;
     
     const piso2Mat = new THREE.MeshStandardMaterial({ 
         color: 0x8B7D6B,
         roughness: 0.6,
-        metalness: 0.1,
+        metalness: 0,
         transparent: true,
         opacity: 0.2
     });
@@ -320,6 +320,41 @@
     piso2Body.addShape(new CANNON.Box(new CANNON.Vec3(4, 0.15, 4)));
     piso2Body.position.set(0, alturaPiso2, 0);
     world.addBody(piso2Body);
+
+    // ============================================================
+    // 8. ESCADA EXTERNA
+    // ============================================================
+    const rampaMat = new THREE.MeshStandardMaterial({ 
+        color: 0xCD853F,
+        roughness: 0.7,
+        metalness: 0.1,
+        side: THREE.DoubleSide
+    });
+
+    // Rampa na lateral da casa (entrando pelo lado direito)
+    const rampaLargura = 3.0;
+    const rampaAltura = alturaPiso2 + 0.5; // Vai até o piso do 2º andar
+    const rampaComprimento = 5.5;
+    const anguloRampa = Math.atan2(rampaAltura, rampaComprimento);
+
+    // Visual da rampa
+    const rampaMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(rampaLargura, 0.1, rampaComprimento),
+        rampaMat
+    );
+    // Posicionar a rampa na lateral direita da casa
+    rampaMesh.position.set(6.5, -0.5 + rampaAltura/2, 0);
+    rampaMesh.rotation.x = -anguloRampa;
+    rampaMesh.castShadow = true;
+    rampaMesh.receiveShadow = true;
+    scene.add(rampaMesh);
+
+    // Física da rampa
+    const rampaBody = new CANNON.Body({ mass: 0 });
+    rampaBody.addShape(new CANNON.Box(new CANNON.Vec3(rampaLargura/2, 0.05, rampaComprimento/2)));
+    rampaBody.position.set(6.5, -0.5 + rampaAltura/2, 0);
+    rampaBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -anguloRampa);
+    world.addBody(rampaBody);
     
     // ============================================================
     // SISTEMA DE DOIS JOYSTICKS
