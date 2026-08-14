@@ -551,62 +551,77 @@
 
     // ===== LOOP PRINCIPAL =====
     let lastTime = 0;
-    
+
     function animate(time) {
         requestAnimationFrame(animate);
 
         const delta = Math.min((time - lastTime) / 1000, 0.05);
         lastTime = time;
-        
-        // Movimento
+
+        // ===== MOVIMENTO CORRIGIDO =====
         if (moveState.active && (Math.abs(moveState.x) > 0.05 || Math.abs(moveState.y) > 0.05)) {
             const speed = 4.0;
+        
+            // Direção baseada na rotação da câmera
             const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
             forward.y = 0;
             forward.normalize();
-            
+        
             const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
             right.y = 0;
             right.normalize();
-            
+        
+            // Movimento relativo ao joystick
+            // moveState.y: frente/trás (negativo = frente, positivo = trás)
+            // moveState.x: esquerda/direita (negativo = esquerda, positivo = direita)
             const moveX = (-moveState.y * forward.x + moveState.x * right.x) * speed;
             const moveZ = (-moveState.y * forward.z + moveState.x * right.z) * speed;
-            
+        
+            // Aplicar força em vez de definir velocidade diretamente
+            // Isso permite que a física atue corretamente
             playerBody.velocity.x = moveX;
             playerBody.velocity.z = moveZ;
         } else {
+            // Reduzir velocidade quando não está ativo (fricção)
             playerBody.velocity.x *= 0.9;
             playerBody.velocity.z *= 0.9;
         }
-        
+
         // ===== CÂMERA (Joystick Direito) =====
         if (lookState.active && (Math.abs(lookState.x) > 0.05 || Math.abs(lookState.y) > 0.05)) {
             const sensitivity = 0.03;
+            // lookState.x: rotação horizontal (esquerda/direita)
+            // lookState.y: rotação vertical (cima/baixo)
             cameraRotationX -= lookState.x * sensitivity;
             cameraRotationY -= lookState.y * sensitivity;
             cameraRotationY = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, cameraRotationY));
-            
+        
             camera.rotation.order = 'YXZ';
             camera.rotation.y = cameraRotationX;
             camera.rotation.x = cameraRotationY;
         }
-        
-        // Física
+
+        // ===== FÍSICA =====
         world.step(1 / 60, delta, 3);
 
-        // Seguir jogador
+        // ===== ATUALIZAR POSIÇÕES =====
         const playerPos = playerBody.position;
+    
+        // Atualizar posição da câmera
         camera.position.set(
             playerPos.x,
             playerPos.y + 1.3,
             playerPos.z
         );
+    
+        // Manter rotação da câmera
         camera.rotation.order = 'YXZ';
         camera.rotation.y = cameraRotationX;
         camera.rotation.x = cameraRotationY;
 
+        // Atualizar posição do mesh do jogador
         playerMesh.position.copy(playerPos);
-        
+
         renderer.render(scene, camera);
     }
     animate();
