@@ -552,7 +552,7 @@
     // ===== LOOP PRINCIPAL =====
     let lastTime = 0;
     
-    function animate() {
+    function animate(time) {
         requestAnimationFrame(animate);
 
         const delta = Math.min((time - lastTime) / 1000, 0.05);
