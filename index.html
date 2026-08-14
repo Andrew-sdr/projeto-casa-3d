@@ -558,34 +558,23 @@
         const delta = Math.min((time - lastTime) / 1000, 0.05);
         lastTime = time;
 
-        // ===== MOVIMENTO CORRIGIDO =====
-        if (moveState.active && (Math.abs(moveState.x) > 0.05 || Math.abs(moveState.y) > 0.05)) {
+        // MOVIMENTO
+        if (moveState.active) {
             const speed = 4.0;
-        
-            // Direção baseada na rotação da câmera
-            const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
-            forward.y = 0;
-            forward.normalize();
-        
-            const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
-            right.y = 0;
-            right.normalize();
-        
-            // Movimento relativo ao joystick
-            // moveState.y: frente/trás (negativo = frente, positivo = trás)
-            // moveState.x: esquerda/direita (negativo = esquerda, positivo = direita)
-            const moveX = (-moveState.y * forward.x + moveState.x * right.x) * speed;
-            const moveZ = (-moveState.y * forward.z + moveState.x * right.z) * speed;
-        
-            // Aplicar força em vez de definir velocidade diretamente
-            // Isso permite que a física atue corretamente
-            playerBody.velocity.x = moveX;
-            playerBody.velocity.z = moveZ;
+            const moveX = moveState.x * speed;
+            const moveZ = -moveState.y * speed;
+
+            // Aplicar força baseada na rotação da câmera
+            const angle = camera.rotation.y;
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+
+            playerBody.velocity.x = moveX * cos - moveZ * sin;
+        playerBody.velocity.z = moveX * sin + moveZ * cos;
         } else {
-            // Reduzir velocidade quando não está ativo (fricção)
-            playerBody.velocity.x *= 0.9;
-            playerBody.velocity.z *= 0.9;
-        }
+            playerBody.velocity.x *= 0.85;
+        playerBody.velocity.z *= 0.85;
+        }   
 
         // ===== CÂMERA (Joystick Direito) =====
         if (lookState.active && (Math.abs(lookState.x) > 0.05 || Math.abs(lookState.y) > 0.05)) {
