@@ -174,7 +174,6 @@
         </div>
         <div class="joystick-label">Câmera</div>
     </div>
-
     <script type="importmap">
     {
         "imports": {
@@ -184,50 +183,42 @@
         }
     }
     </script>
-
     <script type="module">
     // ===== IMPORTAÇÕES =====
     import * as THREE from 'three';
     import * as CANNON from 'cannon-es';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
     // ===== LOADING SCREEN =====
     const loadingDiv = document.getElementById('loading');
     const progressDiv = document.getElementById('progress');
-
-    // ===== FÍSICA =====
+    // ===== FÍSICAS =====
     const world = new CANNON.World();
     world.gravity.set(0, -9.82, 0);
     world.broadphase = new CANNON.SAPBroadphase(world);
     world.defaultContactMaterial.restitution = 0.1;
-
     // ===== CENA =====
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87CEEB);
 
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 1.65, 5);
+    camera.position.set(-8, 1.7, 25);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(renderer.domElement);
-
     // ===== LUZES =====
     scene.add(new THREE.AmbientLight(0x404060, 0.5));
-
     const sun = new THREE.DirectionalLight(0xffffff, 1.5);
     sun.position.set(10, 20, 10);
     sun.castShadow = true;
     sun.shadow.mapSize.width = 1024;
     sun.shadow.mapSize.height = 1024;
     scene.add(sun);
-
     const fillLight = new THREE.DirectionalLight(0x4488ff, 0.3);
     fillLight.position.set(-10, 0, 10);
     scene.add(fillLight);
-
     // ===== CHÃO =====
     console.log('🏗️ Criando chão...');
     const ground = new THREE.Mesh(
@@ -238,21 +229,17 @@
     ground.position.y = -0.5;
     ground.receiveShadow = true;
     scene.add(ground);
-
     const groundBody = new CANNON.Body({ mass: 0 });
     groundBody.addShape(new CANNON.Plane());
     groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
     groundBody.position.set(0, -0.5, 0);
     world.addBody(groundBody);
-
     // ===== CARREGAR MODELO =====
     console.log('📦 Iniciando carregamento do modelo...');
     const loader = new GLTFLoader();
     
-    const modelPath = './casa1.glb';
-
+    const modelPath = './casaFull.glb';
     console.log(`🔍 Tentando carregar: ${modelPath}`);
-
     loader.load(
         modelPath,
         (gltf) => {
@@ -293,33 +280,33 @@
             `;
         }
     );
-
     // ============================================================
     // PISO 2º ANDAR
     // ============================================================
-    const alturaPiso2 = 4.2;
-    
+    const alturaPiso2 = 4.15;
+
     const piso2Mat = new THREE.MeshStandardMaterial({ 
         color: 0x8B7D6B,
         roughness: 0.6,
-        metalness: 0,
+        metalness: 0.1,
         transparent: true,
-        opacity: 0.2
+        opacity: 0
     });
     
     const piso2Mesh = new THREE.Mesh(
-        new THREE.BoxGeometry(8, 0.3, 8),
+        new THREE.BoxGeometry(22.5, 0.3, 15),
         piso2Mat
     );
-    piso2Mesh.position.set(0, alturaPiso2, 0);
+    piso2Mesh.position.set(0.2, alturaPiso2 - 0.2, 0.7);
     piso2Mesh.castShadow = true;
     piso2Mesh.receiveShadow = true;
     scene.add(piso2Mesh);
 
     const piso2Body = new CANNON.Body({ mass: 0 });
-    piso2Body.addShape(new CANNON.Box(new CANNON.Vec3(4, 0.15, 4)));
-    piso2Body.position.set(0, alturaPiso2, 0);
+    piso2Body.addShape(new CANNON.Box(new CANNON.Vec3(11.2, 0.15, 7.5)));
+    piso2Body.position.set(0.2, alturaPiso2 - 0.2, 0.7);
     world.addBody(piso2Body);
+
 
     // ============================================================
     // ESCADA EXTERNA
@@ -331,10 +318,10 @@
         side: THREE.DoubleSide
     });
 
-    // Rampa
-    const rampaLargura = 3.0;
-    const rampaAltura = alturaPiso2 + 0.5;
-    const rampaComprimento = 5.5;
+    // Rampa na lateral da casa (entrando pelo lado direito)
+    const rampaLargura = 2.6;
+    const rampaAltura = alturaPiso2 + 1; // Vai até o piso do 2º andar
+    const rampaComprimento = 7.5;
     const anguloRampa = Math.atan2(rampaAltura, rampaComprimento);
 
     // Visual da rampa
@@ -342,22 +329,22 @@
         new THREE.BoxGeometry(rampaLargura, 0.1, rampaComprimento),
         rampaMat
     );
-        
-    rampaMesh.position.set(6.5, -0.5 + rampaAltura/2, 0);
-    rampaMesh.rotation.x = -anguloRampa;
+    // Posicionar a rampa
+    /*rampaMesh.position.set(1.1, -0.8 + rampaAltura/2, 11.8);
+    rampaMesh.rotation.x = anguloRampa;
     rampaMesh.castShadow = true;
     rampaMesh.receiveShadow = true;
-    scene.add(rampaMesh);
+    scene.add(rampaMesh);*/
 
     // Física da rampa
     const rampaBody = new CANNON.Body({ mass: 0 });
     rampaBody.addShape(new CANNON.Box(new CANNON.Vec3(rampaLargura/2, 0.05, rampaComprimento/2)));
-    rampaBody.position.set(6.5, -0.5 + rampaAltura/2, 0);
-    rampaBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -anguloRampa);
+    rampaBody.position.set(1.1, -0.8 + rampaAltura/2, 11.8);
+    rampaBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), anguloRampa);
     world.addBody(rampaBody);
 
     // ============================================================
-    // PERSONAGEM    
+    // JOGADOR
     // ============================================================
     const playerRadius = 0.3;
     const playerMat = new THREE.MeshStandardMaterial({ 
@@ -378,7 +365,7 @@
         mass: 2,
         shape: new CANNON.Sphere(playerRadius)
     });
-    playerBody.position.set(4, 1.6, 1);
+    playerBody.position.set(0, 1.6, 25);
     playerBody.linearDamping = 0.95;
     playerBody.angularDamping = 0.95;
     world.addBody(playerBody);
@@ -392,7 +379,6 @@
     
     let cameraRotationX = 0;
     let cameraRotationY = 0;
-
     // ===== REPOSICIONAR JOYSTICKS =====
     function reposicionarJoysticks() {
         const moveZone = document.getElementById('joystick-move');
@@ -434,7 +420,6 @@
         lookZone.style.top = 'auto';
         lookZone.style.left = 'auto';
     }
-
     // ===== CONFIGURAR JOYSTICK =====
     function setupJoystick(zoneId, knobId, state) {
         const zone = document.getElementById(zoneId);
@@ -529,12 +514,10 @@
             }
         });
     }
-
     // ===== INICIALIZAR JOYSTICKS =====
     setupJoystick('joystick-move', 'knob-move', moveState);
     setupJoystick('joystick-look', 'knob-look', lookState);
     setTimeout(reposicionarJoysticks, 100);
-
     // ===== DETECÇÃO DE MUDANÇA DE ORIENTAÇÃO =====
     window.addEventListener('resize', () => {
         reposicionarJoysticks();
@@ -542,85 +525,80 @@
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
-
     if (screen.orientation) {
         screen.orientation.addEventListener('change', () => {
             setTimeout(reposicionarJoysticks, 300);
         });
     }
-
     // ===== LOOP PRINCIPAL =====
     let lastTime = 0;
-
+    
     function animate(time) {
         requestAnimationFrame(animate);
-
+        
         const delta = Math.min((time - lastTime) / 1000, 0.05);
         lastTime = time;
+        // ===== MOVIMENTO (Joystick Esquerdo) =====
+        if (moveState.active && (Math.abs(moveState.x) > 0.05 || Math.abs(moveState.y) > 0.05)) {
+            const speed = 3.0;
+            
+            // Direção baseada na rotação da câmera
+            const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+            forward.y = 0;
+            forward.normalize();
+            
+            const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+            right.y = 0;
+            right.normalize();
 
-        // MOVIMENTO
-        if (moveState.active) {
-            const speed = 5.0;
-            // Movimento baseado na câmera
-            const angle = camera.rotation.y;
-            const forward = new THREE.Vector3(-Math.sin(angle), 0, -Math.cos(angle));
-            const right = new THREE.Vector3(Math.cos(angle), 0, -Math.sin(angle));
-    
-            playerBody.velocity.x = (moveState.x * right.x + moveState.y * forward.x) * speed;
-            playerBody.velocity.z = (moveState.x * right.z + moveState.y * forward.z) * speed;
+            const forceX = (-moveState.y * forward.x + moveState.x * right.x) * speed;
+            const forceZ = (-moveState.y * forward.z + moveState.x * right.z) * speed;
+
+            playerBody.velocity.x = forceX;
+            playerBody.velocity.z = forceZ;
         } else {
             playerBody.velocity.x *= 0.9;
             playerBody.velocity.z *= 0.9;
         }
-
+        
         // ===== CÂMERA (Joystick Direito) =====
         if (lookState.active && (Math.abs(lookState.x) > 0.05 || Math.abs(lookState.y) > 0.05)) {
             const sensitivity = 0.03;
-            // lookState.x: rotação horizontal (esquerda/direita)
-            // lookState.y: rotação vertical (cima/baixo)
             cameraRotationX -= lookState.x * sensitivity;
             cameraRotationY -= lookState.y * sensitivity;
             cameraRotationY = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, cameraRotationY));
-        
+            
             camera.rotation.order = 'YXZ';
             camera.rotation.y = cameraRotationX;
             camera.rotation.x = cameraRotationY;
         }
 
-        // ===== FÍSICA =====
+        // Física
         world.step(1 / 60, delta, 3);
 
-        // ===== ATUALIZAR POSIÇÕES =====
+        // Seguir jogador
         const playerPos = playerBody.position;
-    
-        // Atualizar posição da câmera
         camera.position.set(
             playerPos.x,
-            playerPos.y + 1.3,
+            playerPos.y + 1.7,
             playerPos.z
         );
-    
-        // Manter rotação da câmera
         camera.rotation.order = 'YXZ';
         camera.rotation.y = cameraRotationX;
         camera.rotation.x = cameraRotationY;
 
-        // Atualizar posição do mesh do jogador
         playerMesh.position.copy(playerPos);
-
+        
         renderer.render(scene, camera);
     }
     animate(0);
-
     // ===== PREVENÇÃO =====
     document.addEventListener('touchmove', (e) => {
         if (e.target.closest('.joystick-zone') || e.target === renderer.domElement) {
             e.preventDefault();
         }
     }, { passive: false });
-
     document.addEventListener('contextmenu', (e) => e.preventDefault());
-
     console.log('✅ Cena com joysticks iniciada!');
     console.log('📱 Teste no celular ou use o mouse para simular toque');
     </script>
