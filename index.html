@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
-    <title>Modelo 3D com Joysticks</title>
+    <title>Modelo 3D</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         body {
@@ -260,8 +260,8 @@
             
             model.traverse((child) => {
                 if (child.isMesh) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
+                    child.castShadow = false;
+                    child.receiveShadow = false;
                 }
             });
             
@@ -307,8 +307,8 @@
         piso2Mat
     );
     piso2Mesh.position.set(0.2, alturaPiso2 - 0.2, 0.7);
-    piso2Mesh.castShadow = true;
-    piso2Mesh.receiveShadow = true;
+    piso2Mesh.castShadow = false;
+    piso2Mesh.receiveShadow = false;
     scene.add(piso2Mesh);
 
     const piso2Body = new CANNON.Body({ mass: 0 });
