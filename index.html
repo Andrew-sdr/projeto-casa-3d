@@ -219,6 +219,15 @@
     const fillLight = new THREE.DirectionalLight(0x4488ff, 0.3);
     fillLight.position.set(-10, 0, 10);
     scene.add(fillLight);
+
+    const luz1 = new THREE.PointLight(0xffffff, 1.5, 8);
+    luz1.position.set(-5.5, 4, -1);
+    scene.add(luz1);
+
+    const luz2 = new THREE.PointLight(0xffd700, 1.5, 8);
+    luz2.position.set(5.5, 12, -1.5);
+    scene.add(luz2);
+    
     // ===== CHÃO =====
     console.log('🏗️ Criando chão...');
     const ground = new THREE.Mesh(
